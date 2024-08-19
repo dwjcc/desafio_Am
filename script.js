@@ -1,6 +1,7 @@
 let currentPage = 1;
 const itemsPerPage = 15; // Número de itens por página
 let allProperties = []; // Armazena todas as propriedades
+let filteredProperties = []; // Armazena as propriedades filtradas
 let totalPages = 1;
 
 function insertionSort(arr, key, order = 'asc') {
@@ -36,7 +37,7 @@ function renderPaginationControls() {
     prevPageItem.addEventListener('click', () => {
         if (currentPage > 1) {
             currentPage--;
-            renderProperties(paginateProperties(allProperties, currentPage));
+            renderProperties(paginateProperties(filteredProperties, currentPage));
             renderPaginationControls();
         }
     });
@@ -48,7 +49,7 @@ function renderPaginationControls() {
         pageButton.innerHTML = `<a class="page-link" href="#">${i}</a>`;
         pageButton.addEventListener('click', () => {
             currentPage = i;
-            renderProperties(paginateProperties(allProperties, currentPage));
+            renderProperties(paginateProperties(filteredProperties, currentPage));
             renderPaginationControls();
         });
         paginationControls.appendChild(pageButton);
@@ -60,7 +61,7 @@ function renderPaginationControls() {
     nextPageItem.addEventListener('click', () => {
         if (currentPage < totalPages) {
             currentPage++;
-            renderProperties(paginateProperties(allProperties, currentPage));
+            renderProperties(paginateProperties(filteredProperties, currentPage));
             renderPaginationControls();
         }
     });
@@ -70,7 +71,7 @@ function renderPaginationControls() {
 function renderProperties(properties) {
     const propertyList = document.getElementById('property-list');
     propertyList.innerHTML = '';
-    properties.forEach(property => {
+    properties.forEach((property, index) => {
         let listItem = document.createElement('li');
         listItem.className = 'list-group-item';
         listItem.innerHTML = `
@@ -84,7 +85,8 @@ function renderProperties(properties) {
                     Endereço: ${property.rua}, ${property.num} - ${property.bairro}, ${property.cidade}<br>
                     Dormitórios: ${property.planta.dorms}<br>
                     Metragem: ${property.planta.metragem} m²<br>
-                    Vagas: ${property.planta.vagas}
+                    Vagas: ${property.planta.vagas}<br>
+                    <button class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#propertyModal" data-property="${index}">Ver Detalhes</button>
                 </div>
         </div>
         `;
@@ -92,56 +94,105 @@ function renderProperties(properties) {
     });
 }
 
+function filterProperties(term) {
+    return allProperties.filter(property => {
+        const name = property.nome.toLowerCase();
+        const address = `${property.rua} ${property.num} ${property.bairro} ${property.cidade}`.toLowerCase();
+        return name.includes(term.toLowerCase()) || address.includes(term.toLowerCase());
+    });
+}
+
+function showPropertyDetails(property) {
+    const modalBody = document.getElementById('modal-body-content');
+    modalBody.innerHTML = `
+        <div class="row">
+            <div class="col-md-4">
+                <img src="${property.fachada}" alt="Imagem do imóvel" class="img-fluid mb-2" style="max-height: 200px;">
+            </div>
+            <div class="col-md-8">
+                <strong>${property.nome}</strong><br>
+                Preço: R$ ${property.planta.preco.toLocaleString('pt-BR')}<br>
+                Endereço: ${property.rua}, ${property.num} - ${property.bairro}, ${property.cidade}<br>
+                Dormitórios: ${property.planta.dorms}<br>
+                Metragem: ${property.planta.metragem} m²<br>
+                Vagas: ${property.planta.vagas}
+            </div>
+        </div>
+    `;
+}
+
+
 function fetchProperties() {
     fetch('https://api.estagio.amfernandes.com.br/imoveis')
         .then(response => response.json())
         .then(data => {
             allProperties = data;
-            totalPages = Math.ceil(allProperties.length / itemsPerPage);
+            filteredProperties = allProperties;
+            totalPages = Math.ceil(filteredProperties.length / itemsPerPage);
 
-            renderProperties(paginateProperties(allProperties, currentPage));
+            renderProperties(paginateProperties(filteredProperties, currentPage));
             renderPaginationControls();
 
             // Ordenar por nome do condomínio (crescente)
             document.getElementById('sort-by-name-asc').addEventListener('click', () => {
-                let sortedProperties = insertionSort(allProperties.slice(), 'nome', 'asc');
+                let sortedProperties = insertionSort(filteredProperties.slice(), 'nome', 'asc');
                 currentPage = 1;
-                allProperties = sortedProperties;
-                renderProperties(paginateProperties(allProperties, currentPage));
+                filteredProperties = sortedProperties;
+                renderProperties(paginateProperties(filteredProperties, currentPage));
                 renderPaginationControls();
             });
 
             // Ordenar por nome do condomínio (decrescente)
             document.getElementById('sort-by-name-desc').addEventListener('click', () => {
-                let sortedProperties = insertionSort(allProperties.slice(), 'nome', 'desc');
+                let sortedProperties = insertionSort(filteredProperties.slice(), 'nome', 'desc');
                 currentPage = 1;
-                allProperties = sortedProperties;
-                renderProperties(paginateProperties(allProperties, currentPage));
+                filteredProperties = sortedProperties;
+                renderProperties(paginateProperties(filteredProperties, currentPage));
                 renderPaginationControls();
             });
 
             // Ordenar por preço (crescente)
             document.getElementById('sort-by-price-asc').addEventListener('click', () => {
-                let sortedProperties = insertionSort(allProperties.slice(), 'planta.preco', 'asc');
+                let sortedProperties = insertionSort(filteredProperties.slice(), 'planta.preco', 'asc');
                 currentPage = 1;
-                allProperties = sortedProperties;
-                renderProperties(paginateProperties(allProperties, currentPage));
+                filteredProperties = sortedProperties;
+                renderProperties(paginateProperties(filteredProperties, currentPage));
                 renderPaginationControls();
             });
 
             // Ordenar por preço (decrescente)
             document.getElementById('sort-by-price-desc').addEventListener('click', () => {
-                let sortedProperties = insertionSort(allProperties.slice(), 'planta.preco', 'desc');
+                let sortedProperties = insertionSort(filteredProperties.slice(), 'planta.preco', 'desc');
                 currentPage = 1;
-                allProperties = sortedProperties;
-                renderProperties(paginateProperties(allProperties, currentPage));
+                filteredProperties = sortedProperties;
+                renderProperties(paginateProperties(filteredProperties, currentPage));
                 renderPaginationControls();
             });
         })
         .catch(error => console.error('Erro ao buscar imóveis:', error));
 }
 
+document.getElementById('search-input').addEventListener('input', (event) => {
+    const searchTerm = event.target.value;
+    filteredProperties = filterProperties(searchTerm);
+    currentPage = 1;
+    totalPages = Math.ceil(filteredProperties.length / itemsPerPage);
+    renderProperties(paginateProperties(filteredProperties, currentPage));
+    renderPaginationControls();
+});
+
+// Atualize o evento de clique para o botão "Ver Detalhes"
+document.addEventListener('click', function(event) {
+    if (event.target.matches('[data-bs-target="#propertyModal"]')) {
+        const index = event.target.getAttribute('data-property');
+        const property = filteredProperties[index];
+        showPropertyDetails(property);
+    }
+});
+
 document.addEventListener('DOMContentLoaded', fetchProperties);
+
+
 
 
 

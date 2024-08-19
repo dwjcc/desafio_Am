@@ -25,11 +25,12 @@
             </div>
           </div>
         </nav>
-      </header>
+    </header>
 
-      <div class="container mt-5">
+    <div class="container mt-5">
         <h1 class="mb-4">Lista de Imóveis</h1>
         <div class="d-flex mb-4">
+            <input type="text" id="search-input" class="form-control me-2" placeholder="Buscar por nome ou endereço">
             <div class="dropdown me-2">
                 <button class="btn btn-success dropdown-toggle" type="button" id="sortByNameDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                     Ordenar por Nome
@@ -61,12 +62,32 @@
             </ul>
         </nav>
     </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="propertyModal" tabindex="-1" aria-labelledby="propertyModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="propertyModalLabel">Detalhes do Imóvel</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="modal-body-content">
+                    <!-- Conteúdo do modal será inserido aqui via JavaScript -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <footer class="container-fluid">
         <p class="float-end"><a href="#">De volta ao topo</a></p>
-        <p>&copy; 2024 Daniela Jacome </p>
+        <p>&copy; 2024 Daniela Jacome</p>
     </footer>
 
     <script src="script.js"></script>
 </body>
 </html>
+
 
