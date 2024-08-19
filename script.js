@@ -86,7 +86,7 @@ function renderProperties(properties) {
                     Dormitórios: ${property.planta.dorms}<br>
                     Metragem: ${property.planta.metragem} m²<br>
                     Vagas: ${property.planta.vagas}<br>
-                    <button class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#propertyModal" data-property="${index}">Ver Detalhes</button>
+                    <button class="btn btn-success mt-2 btn-details" data-property="${index}">Ver Detalhes</button>
                 </div>
         </div>
         `;
@@ -181,20 +181,16 @@ document.getElementById('search-input').addEventListener('input', (event) => {
     renderPaginationControls();
 });
 
-// Atualize o evento de clique para o botão "Ver Detalhes"
+
 document.addEventListener('click', function(event) {
-    if (event.target.matches('[data-bs-target="#propertyModal"]')) {
+    if (event.target.classList.contains('btn-details')) {
         const index = event.target.getAttribute('data-property');
         const property = filteredProperties[index];
         showPropertyDetails(property);
+
+        const propertyModal = new bootstrap.Modal(document.getElementById('propertyModal'));
+        propertyModal.show();
     }
 });
 
 document.addEventListener('DOMContentLoaded', fetchProperties);
-
-
-
-
-
-
-
