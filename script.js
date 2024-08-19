@@ -1,4 +1,8 @@
-// Função para ordenar usando Insertion Sort, com suporte para chaves aninhadas e ordenação decrescente
+let currentPage = 1;
+const itemsPerPage = 15; // Número de itens por página
+let allProperties = []; // Armazena todas as propriedades
+let totalPages = 1;
+
 function insertionSort(arr, key, order = 'asc') {
     const getValue = (obj, keyPath) => keyPath.split('.').reduce((value, key) => value[key], obj);
 
@@ -14,6 +18,53 @@ function insertionSort(arr, key, order = 'asc') {
         arr[j + 1] = current;
     }
     return arr;
+}
+
+function paginateProperties(properties, page = 1) {
+    const start = (page - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    return properties.slice(start, end);
+}
+
+function renderPaginationControls() {
+    const paginationControls = document.getElementById('pagination-controls');
+    paginationControls.innerHTML = '';
+
+    const prevPageItem = document.createElement('li');
+    prevPageItem.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+    prevPageItem.innerHTML = `<a class="page-link" href="#" tabindex="-1">Anterior</a>`;
+    prevPageItem.addEventListener('click', () => {
+        if (currentPage > 1) {
+            currentPage--;
+            renderProperties(paginateProperties(allProperties, currentPage));
+            renderPaginationControls();
+        }
+    });
+    paginationControls.appendChild(prevPageItem);
+
+    for (let i = 1; i <= totalPages; i++) {
+        let pageButton = document.createElement('li');
+        pageButton.className = `page-item ${i === currentPage ? 'active' : ''}`;
+        pageButton.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+        pageButton.addEventListener('click', () => {
+            currentPage = i;
+            renderProperties(paginateProperties(allProperties, currentPage));
+            renderPaginationControls();
+        });
+        paginationControls.appendChild(pageButton);
+    }
+
+    const nextPageItem = document.createElement('li');
+    nextPageItem.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+    nextPageItem.innerHTML = `<a class="page-link" href="#">Próximo</a>`;
+    nextPageItem.addEventListener('click', () => {
+        if (currentPage < totalPages) {
+            currentPage++;
+            renderProperties(paginateProperties(allProperties, currentPage));
+            renderPaginationControls();
+        }
+    });
+    paginationControls.appendChild(nextPageItem);
 }
 
 function renderProperties(properties) {
@@ -45,37 +96,54 @@ function fetchProperties() {
     fetch('https://api.estagio.amfernandes.com.br/imoveis')
         .then(response => response.json())
         .then(data => {
-            let properties = data;
+            allProperties = data;
+            totalPages = Math.ceil(allProperties.length / itemsPerPage);
 
-            renderProperties(properties);
+            renderProperties(paginateProperties(allProperties, currentPage));
+            renderPaginationControls();
 
             // Ordenar por nome do condomínio (crescente)
             document.getElementById('sort-by-name-asc').addEventListener('click', () => {
-                let sortedProperties = insertionSort(properties.slice(), 'nome', 'asc');
-                renderProperties(sortedProperties);
+                let sortedProperties = insertionSort(allProperties.slice(), 'nome', 'asc');
+                currentPage = 1;
+                allProperties = sortedProperties;
+                renderProperties(paginateProperties(allProperties, currentPage));
+                renderPaginationControls();
             });
 
             // Ordenar por nome do condomínio (decrescente)
             document.getElementById('sort-by-name-desc').addEventListener('click', () => {
-                let sortedProperties = insertionSort(properties.slice(), 'nome', 'desc');
-                renderProperties(sortedProperties);
+                let sortedProperties = insertionSort(allProperties.slice(), 'nome', 'desc');
+                currentPage = 1;
+                allProperties = sortedProperties;
+                renderProperties(paginateProperties(allProperties, currentPage));
+                renderPaginationControls();
             });
 
             // Ordenar por preço (crescente)
             document.getElementById('sort-by-price-asc').addEventListener('click', () => {
-                let sortedProperties = insertionSort(properties.slice(), 'planta.preco', 'asc');
-                renderProperties(sortedProperties);
+                let sortedProperties = insertionSort(allProperties.slice(), 'planta.preco', 'asc');
+                currentPage = 1;
+                allProperties = sortedProperties;
+                renderProperties(paginateProperties(allProperties, currentPage));
+                renderPaginationControls();
             });
 
             // Ordenar por preço (decrescente)
             document.getElementById('sort-by-price-desc').addEventListener('click', () => {
-                let sortedProperties = insertionSort(properties.slice(), 'planta.preco', 'desc');
-                renderProperties(sortedProperties);
+                let sortedProperties = insertionSort(allProperties.slice(), 'planta.preco', 'desc');
+                currentPage = 1;
+                allProperties = sortedProperties;
+                renderProperties(paginateProperties(allProperties, currentPage));
+                renderPaginationControls();
             });
         })
         .catch(error => console.error('Erro ao buscar imóveis:', error));
 }
 
 document.addEventListener('DOMContentLoaded', fetchProperties);
+
+
+
 
 
