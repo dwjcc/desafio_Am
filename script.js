@@ -104,8 +104,9 @@ function filterProperties(term) {
 
 function showPropertyDetails(property) {
     const modalBody = document.getElementById('modal-body-content');
+    const whatsappLink = document.getElementById('whatsapp-link');
     modalBody.innerHTML = `
-        <div class="row" style="color: black;">
+        <div class="row" style="color:black;">
             <div class="col-md-4">
                 <img src="${property.fachada}" alt="Imagem do imóvel" class="img-fluid mb-2" style="max-height: 200px;">
             </div>
@@ -119,6 +120,7 @@ function showPropertyDetails(property) {
             </div>
         </div>
     `;
+    whatsappLink.href = `http://wa.me/5511946029784?text=Olá, tudo bem? Me interessei por ${encodeURIComponent(property.nome)} que estava no site! Vocês poderiam me auxiliar?`;
 }
 
 
