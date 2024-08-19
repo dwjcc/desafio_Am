@@ -1,7 +1,7 @@
 let currentPage = 1;
-const itemsPerPage = 15; // Número de itens por página
-let allProperties = []; // Armazena todas as propriedades
-let filteredProperties = []; // Armazena as propriedades filtradas
+const itemsPerPage = 15; 
+let allProperties = [];
+let filteredProperties = [];
 let totalPages = 1;
 
 function insertionSort(arr, key, order = 'asc') {
@@ -123,7 +123,6 @@ function showPropertyDetails(property) {
     whatsappLink.href = `http://wa.me/5511946029784?text=Olá, tudo bem? Me interessei por ${encodeURIComponent(property.nome)} que estava no site! Vocês poderiam me auxiliar?`;
 }
 
-
 function fetchProperties() {
     fetch('https://api.estagio.amfernandes.com.br/imoveis')
         .then(response => response.json())
@@ -183,11 +182,10 @@ document.getElementById('search-input').addEventListener('input', (event) => {
     renderPaginationControls();
 });
 
-
 document.addEventListener('click', function(event) {
     if (event.target.classList.contains('btn-details')) {
         const index = event.target.getAttribute('data-property');
-        const property = filteredProperties[index];
+        const property = filteredProperties[(currentPage - 1) * itemsPerPage + parseInt(index)];
         showPropertyDetails(property);
 
         const propertyModal = new bootstrap.Modal(document.getElementById('propertyModal'));
