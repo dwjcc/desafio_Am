@@ -105,7 +105,7 @@ function filterProperties(term) {
 function showPropertyDetails(property) {
     const modalBody = document.getElementById('modal-body-content');
     modalBody.innerHTML = `
-        <div class="row">
+        <div class="row" style="color: black;">
             <div class="col-md-4">
                 <img src="${property.fachada}" alt="Imagem do imóvel" class="img-fluid mb-2" style="max-height: 200px;">
             </div>
